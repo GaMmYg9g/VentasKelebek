@@ -6,7 +6,8 @@
     <meta name="theme-color" content="#121212">
     <title>Kelebek - Punto de Venta</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <!-- El ?v=3 fuerza la actualización en los teléfonos -->
+    <link rel="stylesheet" href="styles.css?v=3">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -18,15 +19,14 @@
         <div id="current-date" class="date-display"></div>
     </header>
 
-    <main class="main-container">
+    <main class="main-container" id="view-pos">
         
-        <!-- ZONA DE BÚSQUEDA (Solo el buscador, sin listas por defecto) -->
+        <!-- ZONA DE BÚSQUEDA -->
         <section class="search-section">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" id="search-input" class="search-box" placeholder="Buscar producto..." autocomplete="off">
             </div>
-            <!-- El dropdown de resultados aparecerá aquí dinámicamente -->
             <div id="search-dropdown" class="search-dropdown hidden">
                 <ul id="search-results" class="dropdown-list"></ul>
                 <div id="no-results" class="no-results hidden">No se encontraron productos</div>
@@ -68,19 +68,6 @@
         </section>
     </main>
 
-    <!-- NAVEGACIÓN INFERIOR -->
-    <nav class="bottom-nav">
-        <button class="nav-btn active" data-view="pos" onclick="switchView('pos')">
-            <i class="fas fa-cash-register"></i><span>Vender</span>
-        </button>
-        <button class="nav-btn" data-view="inventory" onclick="switchView('inventory')">
-            <i class="fas fa-boxes"></i><span>Productos</span>
-        </button>
-        <button class="nav-btn" data-view="history" onclick="switchView('history')">
-            <i class="fas fa-chart-line"></i><span>Resumen</span>
-        </button>
-    </nav>
-
     <!-- VISTA: INVENTARIO -->
     <main id="view-inventory" class="admin-view hidden">
         <div class="admin-header">
@@ -93,7 +80,11 @@
 
     <!-- VISTA: HISTORIAL -->
     <main id="view-history" class="admin-view hidden">
-        <h2><i class="fas fa-chart-line"></i> Resumen de Hoy</h2>
+        <div class="admin-header">
+            <h2><i class="fas fa-chart-line"></i> Resumen</h2>
+            <button class="btn-clear-day" onclick="cerrarDia()"><i class="fas fa-door-closed"></i> Cerrar Día</button>
+        </div>
+        
         <div class="summary-cards">
             <div class="card">
                 <span>Ventas</span>
@@ -111,6 +102,19 @@
         <div id="history-list"></div>
     </main>
 
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-view="pos" onclick="switchView('pos')">
+            <i class="fas fa-cash-register"></i><span>Vender</span>
+        </button>
+        <button class="nav-btn" data-view="inventory" onclick="switchView('inventory')">
+            <i class="fas fa-boxes"></i><span>Productos</span>
+        </button>
+        <button class="nav-btn" data-view="history" onclick="switchView('history')">
+            <i class="fas fa-chart-line"></i><span>Resumen</span>
+        </button>
+    </nav>
+
     <!-- MODAL PRODUCTO -->
     <div class="modal" id="product-modal">
         <div class="modal-content">
@@ -127,6 +131,7 @@
         </div>
     </div>
 
-    <script src="app.js?v=2"></script>
+    <!-- El ?v=3 fuerza la actualización en los teléfonos -->
+    <script src="app.js?v=3"></script>
 </body>
 </html>
