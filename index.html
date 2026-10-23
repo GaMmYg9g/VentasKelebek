@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#121212">
+    <title>Kelebek - Punto de Venta</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">
+            <i class="fas fa-cash-register"></i> Kelebek
+        </div>
+        <div id="current-date" class="date-display"></div>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- ZONA DE BÚSQUEDA (Solo el buscador, sin listas por defecto) -->
+        <section class="search-section">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="search-input" class="search-box" placeholder="Buscar producto..." autocomplete="off">
+            </div>
+            <!-- El dropdown de resultados aparecerá aquí dinámicamente -->
+            <div id="search-dropdown" class="search-dropdown hidden">
+                <ul id="search-results" class="dropdown-list"></ul>
+                <div id="no-results" class="no-results hidden">No se encontraron productos</div>
+            </div>
+        </section>
+
+        <!-- TICKET ACTUAL -->
+        <section class="ticket-card">
+            <div class="ticket-header">
+                <h2><i class="fas fa-receipt"></i> Pedido Actual</h2>
+                <button class="btn-clear" onclick="clearCart()" title="Limpiar ticket">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+            
+            <div id="ticket-items-container" class="ticket-items">
+                <p class="empty-msg">Aún no hay productos.</p>
+            </div>
+
+            <div class="ticket-footer">
+                <div class="total-row">
+                    <span>Total:</span>
+                    <span id="ticket-total" class="total-amount">0 CUP</span>
+                </div>
+                
+                <div class="change-section">
+                    <label for="cash-input">Efectivo recibido</label>
+                    <div class="cash-input-wrapper">
+                        <input type="number" id="cash-input" placeholder="0" min="0">
+                        <span>CUP</span>
+                    </div>
+                    <div id="change-display" class="change-display">Vuelto: 0 CUP</div>
+                </div>
+
+                <button class="btn-checkout" onclick="finalizeTicket()">
+                    <i class="fas fa-check-circle"></i> Cobrar Ticket
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- NAVEGACIÓN INFERIOR -->
+    <nav class="bottom-nav">
+        <button class="nav-btn active" data-view="pos" onclick="switchView('pos')">
+            <i class="fas fa-cash-register"></i><span>Vender</span>
+        </button>
+        <button class="nav-btn" data-view="inventory" onclick="switchView('inventory')">
+            <i class="fas fa-boxes"></i><span>Productos</span>
+        </button>
+        <button class="nav-btn" data-view="history" onclick="switchView('history')">
+            <i class="fas fa-chart-line"></i><span>Resumen</span>
+        </button>
+    </nav>
+
+    <!-- VISTA: INVENTARIO -->
+    <main id="view-inventory" class="admin-view hidden">
+        <div class="admin-header">
+            <h2><i class="fas fa-boxes"></i> Productos</h2>
+            <button class="btn-add" onclick="openProductModal()"><i class="fas fa-plus"></i> Nuevo</button>
+        </div>
+        <input type="text" id="inv-search" class="search-box" placeholder="Buscar en productos..." style="margin-bottom: 15px;">
+        <ul id="inventory-list" class="admin-list"></ul>
+    </main>
+
+    <!-- VISTA: HISTORIAL -->
+    <main id="view-history" class="admin-view hidden">
+        <h2><i class="fas fa-chart-line"></i> Resumen de Hoy</h2>
+        <div class="summary-cards">
+            <div class="card">
+                <span>Ventas</span>
+                <strong id="today-total">0 CUP</strong>
+            </div>
+            <div class="card">
+                <span>Tickets</span>
+                <strong id="today-tickets">0</strong>
+            </div>
+        </div>
+        <h3>Productos Vendidos</h3>
+        <ul id="today-summary-list" class="summary-list"></ul>
+        
+        <h2 style="margin-top: 30px;"><i class="fas fa-history"></i> Historial</h2>
+        <div id="history-list"></div>
+    </main>
+
+    <!-- MODAL PRODUCTO -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Agregar Producto</h3>
+            <input type="hidden" id="product-id">
+            <label>Nombre del producto</label>
+            <input type="text" id="product-name" placeholder="Ej: Café expreso">
+            <label>Precio (CUP)</label>
+            <input type="number" id="product-price" placeholder="0" min="0">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveProduct()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
