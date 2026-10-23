@@ -70,6 +70,7 @@ let history = JSON.parse(localStorage.getItem('kelebek_history')) || [];
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
     updateDate();
+    checkAutoClear(); // Revisa si debe borrar por tiempo al abrir
     saveData();
     renderCart();
     renderInventory();
@@ -94,7 +95,7 @@ function saveData() {
 function setupEventListeners() {
     const searchInput = document.getElementById('search-input');
     searchInput.addEventListener('input', handleSearch);
-    searchInput.addEventListener('focus', handleSearch); // Muestra resultados si ya hay texto al enfocar
+    searchInput.addEventListener('focus', handleSearch); 
     
     document.getElementById('inv-search').addEventListener('input', renderInventory);
     document.getElementById('cash-input').addEventListener('input', calculateChange);
@@ -113,7 +114,6 @@ function handleSearch() {
     }
 
     dropdown.classList.remove('hidden');
-    
     const filtered = products.filter(p => p.name.toLowerCase().includes(query));
     
     if (filtered.length === 0) {
@@ -130,7 +130,6 @@ function handleSearch() {
     }
 }
 
-// Cerrar buscador al hacer clic fuera
 document.addEventListener('click', (e) => {
     const searchSection = document.querySelector('.search-section');
     if (searchSection && !searchSection.contains(e.target)) {
@@ -179,11 +178,10 @@ function addToCart(productId) {
     saveData();
     renderCart();
     
-    // Limpiar buscador y ocultar dropdown inmediatamente
     const searchInput = document.getElementById('search-input');
     searchInput.value = '';
     document.getElementById('search-dropdown').classList.add('hidden');
-    searchInput.focus(); // Mantener el foco para seguir agregando
+    searchInput.focus(); 
 }
 
 function updateQty(index, change) {
@@ -240,6 +238,14 @@ function finalizeTicket() {
         return;
     }
 
+    // 1. Revisar si pasaron 24hs ANTES de guardar
+    checkAutoClear();
+
+    // 2. Si el historial está vacío, guardar el momento exacto del primer ticket
+    if (history.length === 0 && !localStorage.getItem('kelebek_first_ticket_time')) {
+        localStorage.setItem('kelebek_first_ticket_time', Date.now());
+    }
+
     const now = new Date();
     const ticket = {
         id: Date.now(),
@@ -258,7 +264,6 @@ function finalizeTicket() {
     saveData();
     renderCart();
     
-    // Pequeña animación o feedback visual (opcional)
     const btn = document.querySelector('.btn-checkout');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-check"></i> ¡Cobrado!';
@@ -271,7 +276,7 @@ function switchView(viewId) {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     
     if (viewId === 'pos') {
-        document.querySelector('.main-container').classList.remove('hidden');
+        document.getElementById('view-pos').classList.remove('hidden');
     } else {
         document.getElementById(`view-${viewId}`).classList.remove('hidden');
         if (viewId === 'history') renderHistory();
@@ -401,8 +406,45 @@ function renderHistory() {
 function deleteTicket(id) {
     if (confirm("¿Eliminar este ticket? Afectará el resumen del día.")) {
         history = history.filter(t => t.id !== id);
+        
+        // Si borraste el único ticket que quedaba, reiniciamos el contador de 24hs
+        if (history.length === 0) {
+            localStorage.removeItem('kelebek_first_ticket_time');
+        }
+        
         saveData();
         renderHistory();
+    }
+}
+
+// --- CIERRE DE DÍA Y AUTOLIMPIEZA ---
+function cerrarDia() {
+    if (confirm("¿Estás seguro de cerrar el día?\n\nSe borrarán todos los tickets y el resumen actual. Esta acción no se puede deshacer.")) {
+        history = [];
+        localStorage.removeItem('kelebek_first_ticket_time');
+        saveData();
+        renderHistory();
+        alert("Día cerrado. Historial borrado.");
+    }
+}
+
+function checkAutoClear() {
+    const firstTicketTime = localStorage.getItem('kelebek_first_ticket_time');
+    if (firstTicketTime) {
+        const now = Date.now();
+        const hours24 = 24 * 60 * 60 * 1000; // 24 horas en milisegundos
+        
+        if (now - parseInt(firstTicketTime) >= hours24) {
+            history = [];
+            localStorage.removeItem('kelebek_first_ticket_time');
+            saveData();
+            console.log("Historial borrado automáticamente (pasaron 24hs)");
+            
+            // Si estás viendo el historial en ese momento, se actualiza en vivo
+            if (!document.getElementById('view-history').classList.contains('hidden')) {
+                renderHistory();
+            }
+        }
     }
 }
 
