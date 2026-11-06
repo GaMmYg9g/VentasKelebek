@@ -6,8 +6,7 @@
     <meta name="theme-color" content="#121212">
     <title>Kelebek - Punto de Venta</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- El ?v=3 fuerza la actualización en los teléfonos -->
-    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="styles.css?v=5">
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -16,7 +15,11 @@
         <div class="logo">
             <i class="fas fa-cash-register"></i> Kelebek
         </div>
-        <div id="current-date" class="date-display"></div>
+        <div class="worker-badge" onclick="openWorkerModal()">
+            <i class="fas fa-user-circle"></i>
+            <span id="current-worker-name">Asignar Turno</span>
+            <i class="fas fa-chevron-down" style="font-size: 10px; margin-left: 5px;"></i>
+        </div>
     </header>
 
     <main class="main-container" id="view-pos">
@@ -37,9 +40,14 @@
         <section class="ticket-card">
             <div class="ticket-header">
                 <h2><i class="fas fa-receipt"></i> Pedido Actual</h2>
-                <button class="btn-clear" onclick="clearCart()" title="Limpiar ticket">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-icon text-gold" onclick="cerrarTurno()" title="Cerrar Turno">
+                        <i class="fas fa-door-closed"></i>
+                    </button>
+                    <button class="btn-icon text-danger" onclick="clearCart()" title="Limpiar ticket">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </div>
             
             <div id="ticket-items-container" class="ticket-items">
@@ -81,24 +89,21 @@
     <!-- VISTA: HISTORIAL -->
     <main id="view-history" class="admin-view hidden">
         <div class="admin-header">
-            <h2><i class="fas fa-chart-line"></i> Resumen</h2>
-            <button class="btn-clear-day" onclick="cerrarDia()"><i class="fas fa-door-closed"></i> Cerrar Día</button>
+            <h2><i class="fas fa-chart-line"></i> Historial (31 días)</h2>
+            <button class="btn-clear-day" onclick="cerrarDiaManual()"><i class="fas fa-door-closed"></i> Cerrar Día</button>
         </div>
         
         <div class="summary-cards">
             <div class="card">
-                <span>Ventas</span>
+                <span>Ventas Hoy</span>
                 <strong id="today-total">0 CUP</strong>
             </div>
             <div class="card">
-                <span>Tickets</span>
+                <span>Tickets Hoy</span>
                 <strong id="today-tickets">0</strong>
             </div>
         </div>
-        <h3>Productos Vendidos</h3>
-        <ul id="today-summary-list" class="summary-list"></ul>
-        
-        <h2 style="margin-top: 30px;"><i class="fas fa-history"></i> Historial</h2>
+
         <div id="history-list"></div>
     </main>
 
@@ -111,7 +116,7 @@
             <i class="fas fa-boxes"></i><span>Productos</span>
         </button>
         <button class="nav-btn" data-view="history" onclick="switchView('history')">
-            <i class="fas fa-chart-line"></i><span>Resumen</span>
+            <i class="fas fa-clipboard-list"></i><span>Historial</span>
         </button>
     </nav>
 
@@ -125,13 +130,28 @@
             <label>Precio (CUP)</label>
             <input type="number" id="product-price" placeholder="0" min="0">
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button class="btn btn-secondary" onclick="closeModal('product-modal')">Cancelar</button>
                 <button class="btn btn-primary" onclick="saveProduct()">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- El ?v=3 fuerza la actualización en los teléfonos -->
-    <script src="app.js?v=3"></script>
+    <!-- MODAL TRABAJADORES -->
+    <div class="modal" id="worker-modal">
+        <div class="modal-content">
+            <h3>Trabajadores</h3>
+            <ul id="worker-list" class="admin-list" style="margin-bottom: 20px; max-height: 200px; overflow-y: auto;"></ul>
+            
+            <label id="worker-form-label">Agregar nuevo trabajador</label>
+            <input type="hidden" id="edit-worker-old-name">
+            <input type="text" id="new-worker-name" placeholder="Escribe el nombre">
+            <div class="modal-actions" style="justify-content: space-between;">
+                <button class="btn btn-secondary" onclick="closeWorkerModal()">Cerrar</button>
+                <button class="btn btn-primary" id="btn-save-worker" onclick="saveWorker()">Agregar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js?v=5"></script>
 </body>
 </html>
